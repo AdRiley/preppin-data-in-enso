@@ -1,0 +1,73 @@
+from Standard.Base import all
+from Standard.Table import all
+from Standard.Database import all
+from Standard.AWS import all
+from Standard.Google_Api import all
+from Standard.Snowflake import all
+import Standard.Examples
+import Standard.Visualization
+from project.Util import all
+
+## # 2019: Week 2
+   
+   [February 20, 2019](https://preppindata.blogspot.com/2019/02/2019-week-2.html "permanent link")
+   
+   So you survived week one (note: if you haven’t completed week one - [go back and give it a go](https://preppindata.blogspot.com/2019/02/2019-week-1.html) as we will be layering the techniques over time)... well done and let’s kick this up a notch. 
+   
+   This week’s challenge uses a few of [Jonathan’s](https://www.thedataschool.co.uk/blog/jonathan-allenby/) and [my](https://www.thedataschool.co.uk/blog/carl-allchin/) favourite Tableau Prep features. Prep has a load of great features built in to the menus so let’s see which of them you can use to save you lots of fiddly calculations. 
+   
+   ![](https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjYpk8aVu2FNiSLM-J35DP8GQLFO0gOlkRkHdrZNUVd9FOhXAY2pPc5e4zXi3sPSnaXtXMGXTSeVQ2CbnQO91k_GDZ4lP9pDzD5HXKiI2l-XodKWHK1D-JvT9_p_Z4d0rf0TpM25Se54DJH/s320/Week+Two+input.JPG)
+   
+   
+   
+   
+   ![](https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEieDT0haJfL7GB7eCMChQDivN5pvrL_f4kF3eSepPmtMLrHcxEOXKaBdVNlGhkO4hJTI5qlJSfeszS7xTf9xv0VlJDVU48rS2SiFChvfmLBcBqKgSuymh2-3j2N6Rn3S6fXYXMOgyStM36R/s320/Week+Two+Output.JPG)
+   
+   
+   
+   
+   So what’s the data? We need you decide where you are going to in the UK; London or Edinburgh, purely based on the weather (every Brit’s favourite subject).
+   
+   Requirements for this week:
+   
+   - [Import the file](https://drive.google.com/open?id=1MxosCq-JcWLGtaAcNH2vQPgPvOw_RIWM)
+   - Get rid of those nicely formatted titles - no-one is viewing this in Excel! (sorry Excel fans)
+   - Make sure you get all the data in the Excel sheet loaded in to Prep
+   - Clean up the City names to create two cities in one column (London and Edinburgh)
+   - Pivot the data to give a measure per column for the four metrics in the data set
+   - Output the data to csv
+   
+   Your output file should:
+   
+   - have 6 columns
+   - have 14 rows of data and a row of headers
+   - Have no cells without a value
+   - Just load beautifully into Tableau
+   
+   ![](https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEi6gbDd-TH_73ACbXO4Gb70gpf0VLZqEp0V1aE3VK7xL1054Hnr6YzI0N2bChwx3W7awHJ-j5WJUqxNyIMJc-fYRfzlTDMiAScnWCpe_jn7a3OWoX-waVZAglvW7fuBF6nAERXwchsK_fzT/s400/Week+Two+Output.JPG)
+   
+   For comparison, here's [our output file](https://drive.google.com/open?id=1N-5MIoT_KEQE01IYZgC3OlXsNAJZKAmv). Don't to forget to fill in our [participation tracker](https://docs.google.com/forms/d/e/1FAIpQLSdZzudRXwUvjhWwNawwz1kGXcYeQ9gBnAhCOvlA7qEDknGu4A/viewform)!
+main =
+    node2 = Data.read (enso_project.data / 'PD 2019 Wk 2.xlsx')
+    node3 = Data.read (enso_project.data / 'Week Two Output.csv') (..Delimited '\t')
+    node4 = node2.read 'PC Wk 02'
+    table1 = node4.filter_blank_rows ..All_Cells
+    ## Remove duplicate header row midway down table
+    any1 = table1.filter 'City' (..Not_Equal "City")
+    ## Lookup table to fix city mis-spellings
+    table2 = Table.new [['Find', ['Londen', 'Edinborgh', 'nodonL', 'Lond0n', 'Ed1nburgh', 'london', 'edinburgh', 'edinborgh', 'Londoon', 'Ed!nburgh', '3d!nburgh', 'London', 'Edenburgh', 'Edinburgh', 'Londin']], ['Replace', ['London', 'Edinburgh', 'London', 'London', 'Edinburgh', 'London', 'Edinburgh', 'Edinburgh', 'London', 'Edinburgh', 'Edinburgh', 'London', 'Edinburgh', 'Edinburgh', 'London']]]
+    ## Clean the city names using the lookup table
+    any2 = any1.replace table2 ['City'] allow_unmatched_rows=False
+    any4 = any2.set (expr '[Metric] + " - " + [Measure]') 'Header'
+    any3 = any4.cross_tab ['City', 'Date'] 'Header' (..First 'Value')
+    table3 = node3.parse ['Date'] ..Date 'dd/MM/yyyy'
+    table4 = any3.auto_cast
+    any5 = table4.sort [(..Name 'City'), (..Name 'Date')]
+    any7 = any5.select_columns ['City', 'Date', 'Wind Speed - mph', 'Max Temperature - Celsius', 'Min Temperature - Celsius', 'Precipitation - mm'] True
+    node1 = any7.should_equal table3
+
+
+
+#### METADATA ####
+[[{"index":{"value":2878},"size":{"value":51}},"41209122-8ec6-4cc3-98e8-8af03ebcb151"],[{"index":{"value":2942},"size":{"value":53}},"b428a040-698b-4448-b259-4142552798c5"],[{"index":{"value":2942},"size":{"value":72}},"7551c3cd-5a94-4ae8-a3f9-8bb084c67c4e"],[{"index":{"value":3027},"size":{"value":21}},"8475f271-2c25-4f79-a9a4-f2219db0f4be"],[{"index":{"value":3062},"size":{"value":23}},"6340d7b8-0549-442d-9f84-5bfeb556a7bc"],[{"index":{"value":3062},"size":{"value":35}},"15cc81fc-bb68-4e3f-bc54-88d8677b0ccd"],[{"index":{"value":3162},"size":{"value":13}},"27215901-0882-477c-b778-958a21a029c8"],[{"index":{"value":3162},"size":{"value":20}},"3451ecc6-5023-47d8-ab03-c06bef1db566"],[{"index":{"value":3162},"size":{"value":41}},"5faf81ac-d732-4469-a40d-3bf7b22d1ce4"],[{"index":{"value":3263},"size":{"value":9}},"c43bf91f-249e-40a3-8fc0-55df29371acc"],[{"index":{"value":3263},"size":{"value":386}},"c2a04b3c-c44c-4ebe-99a8-c81e82ff2f7f"],[{"index":{"value":3712},"size":{"value":12}},"814f8d7c-d9fd-44d1-812d-acedcacf3f48"],[{"index":{"value":3712},"size":{"value":19}},"957a05fe-bf6e-41a2-97bb-e7bfb96f618d"],[{"index":{"value":3712},"size":{"value":28}},"d7782fe0-3d23-4019-ab63-2d41e2b2c5d2"],[{"index":{"value":3712},"size":{"value":55}},"ea5973e7-3bbc-4605-b32e-bee725c46c04"],[{"index":{"value":3779},"size":{"value":8}},"c83c800a-9abd-41fb-a7bc-4d6397f26968"],[{"index":{"value":3779},"size":{"value":46}},"26d98eed-74b1-4033-b48e-604f524a850a"],[{"index":{"value":3779},"size":{"value":55}},"ccd3a343-2106-419c-a825-e7a60e13e150"],[{"index":{"value":3846},"size":{"value":14}},"6f5ee4bf-8435-4faa-8c72-5bccbd4472cc"],[{"index":{"value":3846},"size":{"value":31}},"a423f2d5-30d6-4395-a1a2-5d5a6472a0c5"],[{"index":{"value":3846},"size":{"value":40}},"6c8004b4-65a7-4362-83c8-41ca952bf01c"],[{"index":{"value":3846},"size":{"value":58}},"a8b45e9e-74a2-45c9-88bd-c5a1fe98f99f"],[{"index":{"value":3918},"size":{"value":11}},"1663578a-89a8-4e52-85da-5bc4ab6bc846"],[{"index":{"value":3918},"size":{"value":20}},"cef99a7c-a8ee-4824-aa61-8ef3db30d433"],[{"index":{"value":3918},"size":{"value":27}},"9bef03a6-dab2-4542-bdf3-37e0a78015aa"],[{"index":{"value":3918},"size":{"value":40}},"6e149504-3b90-40c3-9b45-31b954898571"],[{"index":{"value":3972},"size":{"value":14}},"83d69e91-7a50-4751-a4ca-0e72fabef116"],[{"index":{"value":3998},"size":{"value":11}},"524c8c4a-2f4d-4705-bf6c-e62bcd28e968"],[{"index":{"value":3998},"size":{"value":46}},"7a421547-033f-442e-ac2c-470d3f8ba00f"],[{"index":{"value":4056},"size":{"value":19}},"20b2a368-8e18-46f9-a4de-59b6cd5bef60"],[{"index":{"value":4056},"size":{"value":136}},"1fd33b70-53b6-4602-a012-bc95a47beccf"],[{"index":{"value":4056},"size":{"value":141}},"369c156a-2db6-448d-89ac-395ea69e5d2a"],[{"index":{"value":4210},"size":{"value":17}},"d6156043-f4d3-4b46-a996-b4d6dbedbdf2"],[{"index":{"value":4210},"size":{"value":24}},"d0623d77-fa00-4425-bf6b-5a53bae16b95"]]
+{"ide":{"node":{"41209122-8ec6-4cc3-98e8-8af03ebcb151":{"position":{"vector":[-504,139]}},"7551c3cd-5a94-4ae8-a3f9-8bb084c67c4e":{"position":{"vector":[-442,-635]}},"b428a040-698b-4448-b259-4142552798c5":{"position":{"vector":[-442,-635]}},"8475f271-2c25-4f79-a9a4-f2219db0f4be":{"position":{"vector":[-504,67]},"visualization":{"show":false,"width":748.78125,"height":537.48828125}},"15cc81fc-bb68-4e3f-bc54-88d8677b0ccd":{"position":{"vector":[-504,-5]},"visualization":{"show":false,"width":753.78515625,"height":409.04296875}},"6340d7b8-0549-442d-9f84-5bfeb556a7bc":{"position":{"vector":[-510,195]}},"5faf81ac-d732-4469-a40d-3bf7b22d1ce4":{"position":{"vector":[-504,-75]}},"3451ecc6-5023-47d8-ab03-c06bef1db566":{"position":{"vector":[-510,123]}},"27215901-0882-477c-b778-958a21a029c8":{"position":{"vector":[-510,123]}},"c2a04b3c-c44c-4ebe-99a8-c81e82ff2f7f":{"position":{"vector":[-97,-5]}},"c43bf91f-249e-40a3-8fc0-55df29371acc":{"position":{"vector":[159,-188]}},"ea5973e7-3bbc-4605-b32e-bee725c46c04":{"position":{"vector":[-504,-203]}},"d7782fe0-3d23-4019-ab63-2d41e2b2c5d2":{"position":{"vector":[-484,-276]},"visualization":{"show":true}},"957a05fe-bf6e-41a2-97bb-e7bfb96f618d":{"position":{"vector":[-484,-276]}},"814f8d7c-d9fd-44d1-812d-acedcacf3f48":{"position":{"vector":[-484,-276]}},"ccd3a343-2106-419c-a825-e7a60e13e150":{"position":{"vector":[-504,-275]}},"26d98eed-74b1-4033-b48e-604f524a850a":{"position":{"vector":[-432,-513]}},"c83c800a-9abd-41fb-a7bc-4d6397f26968":{"position":{"vector":[-432,-508]}},"a8b45e9e-74a2-45c9-88bd-c5a1fe98f99f":{"position":{"vector":[-504,-347]}},"6c8004b4-65a7-4362-83c8-41ca952bf01c":{"position":{"vector":[-510,-399]}},"a423f2d5-30d6-4395-a1a2-5d5a6472a0c5":{"position":{"vector":[-504,-513]}},"6f5ee4bf-8435-4faa-8c72-5bccbd4472cc":{"position":{"vector":[-504,-513]}},"6e149504-3b90-40c3-9b45-31b954898571":{"position":{"vector":[-442,-707]}},"9bef03a6-dab2-4542-bdf3-37e0a78015aa":{"position":{"vector":[-309,-756]}},"cef99a7c-a8ee-4824-aa61-8ef3db30d433":{"position":{"vector":[-309,-756]}},"1663578a-89a8-4e52-85da-5bc4ab6bc846":{"position":{"vector":[-309,-756]}},"83d69e91-7a50-4751-a4ca-0e72fabef116":{"position":{"vector":[-504,-419]}},"7a421547-033f-442e-ac2c-470d3f8ba00f":{"position":{"vector":[-504,-491]}},"524c8c4a-2f4d-4705-bf6c-e62bcd28e968":{"position":{"vector":[-504,-589]}},"369c156a-2db6-448d-89ac-395ea69e5d2a":{"position":{"vector":[-504,-563]}},"1fd33b70-53b6-4602-a012-bc95a47beccf":{"position":{"vector":[-504,-615]}},"20b2a368-8e18-46f9-a4de-59b6cd5bef60":{"position":{"vector":[-504,-615]}},"d0623d77-fa00-4425-bf6b-5a53bae16b95":{"position":{"vector":[-504,-779]},"visualization":{"show":true,"width":1257.5,"height":381.3359375,"project":{"project":"Builtin"},"name":"Table"}},"d6156043-f4d3-4b46-a996-b4d6dbedbdf2":{"position":{"vector":[-510,-657]},"visualization":{"show":true,"width":662.20703125,"height":443.3671875,"project":{"project":"Builtin"},"name":"Warnings"}}},"import":{}}}
