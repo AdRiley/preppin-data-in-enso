@@ -1,0 +1,5 @@
+name: PD_2024_Wk40
+namespace: local
+version: 0.0.1
+edition: 2024.4.2-rc2
+prefer-local-libraries: 'true'
