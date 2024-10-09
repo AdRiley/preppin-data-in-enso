@@ -12,7 +12,7 @@ Table.should_equal self expected:Table -> Table =
     loc = Meta.get_source_location 1
     Panic.catch Test_Failure_Error (table_should_equal_impl self expected loc) error->
         Error.throw error.payload.message
-    self
+
 
 Column.should_equal : Any -> Integer -> Any
 Column.should_equal self expected frames_to_skip=0 =
