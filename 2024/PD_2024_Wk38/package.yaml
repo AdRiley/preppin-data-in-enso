@@ -1,0 +1,5 @@
+name: PD_2024_Wk38
+namespace: local
+version: 0.0.1
+edition: 2024.4.1
+prefer-local-libraries: 'true'
