@@ -1,0 +1,109 @@
+from Standard.Base import all
+from Standard.Table import all
+from Standard.Database import all
+from Standard.AWS import all
+from Standard.Google_Api import all
+from Standard.Snowflake import all
+import Standard.Examples
+import Standard.Visualization
+
+## # 2024: Week 41 - Forbes Highest Paid Athletes
+   
+   [October 09, 2024](https://preppindata.blogspot.com/2024/10/2024-week-41-forbes-highest-paid.html "permanent link")
+   
+   Challenge by: [Robbin Vernooij](https://www.theinformationlab.co.uk/about/team/robbin-vernooij/)
+   
+   Recently, one of the Data School Coaches, Robbin, set the following challenge. It seemed perfect for a Preppin' Data, so over to Robbin:
+   
+   We'd like to get historical data on the highest paid athletes so we can do temporal analysis.
+   
+   Lucky us, it turns out Wikipedia has been tracking the Forbes list of the world's highest-paid athletes. Unlucky us, it is in an HTML table format with human readable symbols and table by table basis. Now it's time for you to clean it up into one single dataset, so that it's ready for analysis.
+   
+   ### Inputs
+   
+   The data for this challenge comes from this [Wikipedia page](https://en.wikipedia.org/wiki/Forbes_list_of_the_world%27s_highest-paid_athletes). There is a table for each year that looks like this (2024 example):
+   
+   ![](https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgX1Mw_vVe_POk8m5BdgkpEwG1j1uAHOxn0QP-dP7Ty8gx9wvQipdug0RdM60aumYrVNDnExoZahZVoSfAxnrx7stJWNTHCjisg2QBvd9j1LKuC7hkphTvIxHUypt2RqRicAAn_e3u2CZ-ixcKg4sllzg58zKnGONRRRVMJEC8M8SPyJjJ89qQlEIEERd_t/w640-h210/Screenshot%202024-10-07%20114808.png)
+   
+   As well as a source table:
+   
+   ![](https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjXQjyBY8JypBmOA3GcGJ3ir7o-eLm2ljNVRODCwt82Y-IEYB7g0QV1dRYv23t2RSW44OidGoUja4lrO0uCxFN3_6w9SvipaoGmeRb86QLbDFVELHq-XY9x3baxqrVys0YrdxhPx5vtIuYW5zcoxJbEUXYoCcx-YiZtrrUwBYMjRCIuyc0VxfL3SKM5Nb_p/w640-h52/Screenshot%202024-10-07%20114756.png)
+   
+   ### Requirements
+   
+   - [Input the data](https://docs.google.com/spreadsheets/d/1qYcePyK2ptvbTVuCqepsZdS31xv3DvnQ/edit?usp=drive_link&ouid=113142875990517226017&rtpof=true&sd=true)
+   - Bring all the year tables together into a single table
+   - Merge any mismatched fields (there should not be any Null values) 
+   - Create a numeric Year field
+   - Clean up the fields with the monetary amounts 
+   - One way of doing this could be pivot all 3 columns into a single column to do these cleaning calculations once and then pivot back to 3 columns
+   - Make sure that any value in millions is translated to that amount 
+       - e.g. $6 million becomes 6,000,000
+   - Bring in the source information so that it is associated with each row
+   - Remove unnecessary fields
+   - [Output the data](https://drive.google.com/file/d/1gXCOsJeZ7jyqSz0GISNbZzzuJEKrqPG5/view?usp=drive_link)
+   
+   ### Output
+   
+   ![](https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhpZGutpJOT8qblYXSTxj0xFyQ5grpvjuLWYC_rWj5B39hLFrRfn0KROC5Nnc6yiSbO_vRNWfHogrA6Xn8oP8QW6C2T4qlGXIq4M1tbblbgrPux-nVwEILOu9FqaaCyfLwL8wqRgtXxSq_hmNk3loM7pjZGXycMsicCYFMQPVkd4GzHnlJpTRef1EAnhVsn/w640-h92/Screenshot%202024-10-07%20114146.png)
+   
+   - 9 fields
+   - Year
+   - Rank
+   - Name
+   - Sport
+   - Country
+   - Total earnings
+   - Salary/Winnings
+   - Endorsements
+   - Source
+   - 130 rows (131 including headers)
+   
+   You can view the output [here](https://drive.google.com/file/d/1gXCOsJeZ7jyqSz0GISNbZzzuJEKrqPG5/view?usp=drive_link).
+   
+   After you finish the challenge make sure to fill in the [participation tracker](https://docs.google.com/forms/d/e/1FAIpQLSdZzudRXwUvjhWwNawwz1kGXcYeQ9gBnAhCOvlA7qEDknGu4A/viewform), then share your solution on Twitter using [#PreppinData](https://twitter.com/search?q=%23preppindata&src=typed_query) and tagging [@Datajedininja](https://twitter.com/Datajedininja), [@JennyMartinDS14](https://twitter.com/JennyMartinDS14) & [@TomProwse1](https://twitter.com/TomProwse1)
+   
+   You can also post your solution on the [Tableau Forum](https://community.tableau.com/s/group/0F94T000000gQqoSAE/preppindata) where we have a Preppin' Data community page. Post your solutions and ask questions if you need any help!
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+main =
+    file2 = Data.read (enso_project.data / 'Forbes Highest Paid Athletes Input.xlsx')
+    vector1 = file2.sheet_names
+    vector2 = vector1.filter (..Not_Equal "Source")
+    table1 = file2.read_many vector2
+    any1 = table1.filter 'Rank' ..Not_Nothing
+    table2 = any1.add_row_number 'RowID'
+    any2 = table2.transpose ['RowID']
+    any3 = any2.replace [(Pair.Value 'Nation' 'Country'), (Pair.Value 'Nationality' 'Country'), (Pair.Value 'Salary/Winnings' 'Salary/winnings'), (Pair.Value 'Total' 'Total earnings')] ['Name']
+    any4 = any3.cross_tab ['RowID'] 'Name' (..First 'Value')
+    any5 = any4.rename_columns [(Pair.Value 'Sheet Name' 'Year')]
+    table3 = any5.parse ['Year'] ..Integer
+    any6 = table3.transpose ['RowID', 'Sport', 'Year', 'Country', 'Rank', 'Name'] 'Header'
+    any7 = any6.set (..Simple_Expr (..Name 'Value') (..Text (..Trim ..Both "*$million "))) '' ..Update
+    table4 = any7.parse ['Value'] ..Float
+    any8 = table4.set (expr '[Value]*1000000') 'Value'
+    any9 = any8.cross_tab ['RowID', 'Sport', 'Year', 'Country', 'Rank', 'Name'] 'Header' (..First 'Value')
+    table5 = file2.read 'Source' ..Has_Headers
+    table6 = table5.filter_blank_rows
+    table7 = any9.cross_join table6
+    any10 = table7.select_columns ['Year', 'Rank', 'Name', 'Sport', 'Country', 'Total earnings', 'Salary/winnings', 'Endorsements', 'Source'] reorder=True
+    any11 = any10.sort [(..Name 'Year' ..Descending), (..Name 'Rank' ..Descending)]
+
+
+
+#### METADATA ####
+[[{"index":{"value":4278},"size":{"value":73}},"92a1ddfd-7652-4a61-b18f-adb097f6c829"],[{"index":{"value":4366},"size":{"value":17}},"a32cf4c3-d0c2-499d-8302-cb1865b95787"],[{"index":{"value":4398},"size":{"value":14}},"0a18098b-a2b8-46d1-b52f-93152bc07d08"],[{"index":{"value":4398},"size":{"value":37}},"d5f7533b-7ae0-4c12-af3b-ccbf4bba666f"],[{"index":{"value":4449},"size":{"value":15}},"de411875-20f9-4184-8507-11f1339aa39c"],[{"index":{"value":4449},"size":{"value":23}},"85d9b304-b714-4c5d-b897-f19a33a56180"],[{"index":{"value":4484},"size":{"value":13}},"36e27072-1c27-4a3f-8093-8a00b7743ef2"],[{"index":{"value":4484},"size":{"value":20}},"9ba90154-866e-407b-b280-14bc1c6d3177"],[{"index":{"value":4484},"size":{"value":34}},"38ce4445-1272-4395-8c7d-557283a903f6"],[{"index":{"value":4532},"size":{"value":19}},"c6a6ef77-962e-4d53-8572-40211ed7cc6e"],[{"index":{"value":4532},"size":{"value":27}},"f99ef96e-ec33-4702-ba8a-3e07741c1bad"],[{"index":{"value":4571},"size":{"value":16}},"23ccaea4-f2db-4630-9447-be2b930e97d5"],[{"index":{"value":4571},"size":{"value":26}},"af3265a6-ed1a-4fcf-879c-a62bf39f9d1b"],[{"index":{"value":4609},"size":{"value":12}},"275a19f1-6064-4786-865b-e694b3768278"],[{"index":{"value":4609},"size":{"value":173}},"e467a614-9e76-45ca-b9bb-dd6d39afa442"],[{"index":{"value":4609},"size":{"value":182}},"ebe0b345-9d83-4241-a248-b38e8cf61865"],[{"index":{"value":4803},"size":{"value":14}},"a3ff5566-7a23-4b80-bfcb-858dd0d42f1c"],[{"index":{"value":4803},"size":{"value":24}},"47d5cd00-640d-439d-ac2c-883a821f7406"],[{"index":{"value":4803},"size":{"value":31}},"7a9f7f04-c2d9-4c0b-ad8a-cc4a3074a047"],[{"index":{"value":4803},"size":{"value":49}},"be60af2f-7b40-40bd-9b01-b8fe0c638095"],[{"index":{"value":4864},"size":{"value":19}},"3fee338c-f117-4d10-99f0-932ab685b4d0"],[{"index":{"value":4864},"size":{"value":54}},"2fb2e4d9-6f8f-4802-9f5a-48262545c83e"],[{"index":{"value":4932},"size":{"value":10}},"0ad2dc7c-4617-417b-ba17-594e6d1fe41e"],[{"index":{"value":4932},"size":{"value":19}},"20813c51-2c18-4df5-b18d-5b84ab446dbb"],[{"index":{"value":4932},"size":{"value":29}},"b0b6da6e-ee4d-45d7-81f8-109183fe47be"],[{"index":{"value":4973},"size":{"value":16}},"928b87e3-4707-4cbb-bd63-30802525a37d"],[{"index":{"value":4973},"size":{"value":70}},"51a96718-6d1f-4e4b-b4cb-1de7bb2b55bc"],[{"index":{"value":4973},"size":{"value":79}},"5f337092-acf3-47be-a7f2-7b13d270e2eb"],[{"index":{"value":5064},"size":{"value":8}},"51fadcd7-8acf-4805-87e9-a94c3a015857"],[{"index":{"value":5064},"size":{"value":79}},"cad0c232-a1d9-49ea-b0b6-48e18d25d1e9"],[{"index":{"value":5064},"size":{"value":82}},"7a3231bd-c13c-4b12-8bd3-4a6179d44dde"],[{"index":{"value":5064},"size":{"value":91}},"49aa9abc-dcb3-4b79-9d1c-e66ca6190497"],[{"index":{"value":5169},"size":{"value":10}},"13f63f5c-9b95-4ffc-a593-62b1e5379bd7"],[{"index":{"value":5169},"size":{"value":20}},"c052382d-e887-484f-8e38-8251eb41e53f"],[{"index":{"value":5169},"size":{"value":28}},"b5b6ac4d-803d-4c52-b0ab-d47696f2af4c"],[{"index":{"value":5209},"size":{"value":10}},"727750b9-db4c-4152-90e9-3bb34af9d285"],[{"index":{"value":5209},"size":{"value":35}},"c2280777-c04d-4757-aa9f-539075d0da08"],[{"index":{"value":5209},"size":{"value":43}},"3c978e87-17e3-4e07-8978-69a61f8fb25a"],[{"index":{"value":5264},"size":{"value":14}},"dced2708-cd48-4e33-9c89-229003bd4a56"],[{"index":{"value":5264},"size":{"value":68}},"ee968447-ab89-4b74-a655-75042a9b8ca8"],[{"index":{"value":5264},"size":{"value":77}},"3e924f2e-cbaa-41d7-a7d0-6cca8008347e"],[{"index":{"value":5264},"size":{"value":95}},"bee7b8cc-8c10-418e-9adc-f505b11c8e57"],[{"index":{"value":5373},"size":{"value":10}},"ebaedb5a-f039-4df5-86dd-36baae23d886"],[{"index":{"value":5373},"size":{"value":19}},"33b404e7-1f43-4746-b931-5e28e3e4869c"],[{"index":{"value":5373},"size":{"value":33}},"7e9981bd-f6f3-4f06-8145-950fec353042"],[{"index":{"value":5420},"size":{"value":24}},"837f860d-9eaa-4c1e-9735-8d616f8a9ce5"],[{"index":{"value":5458},"size":{"value":15}},"cd4d6fbc-feb6-4645-9ee4-83473fdf98d0"],[{"index":{"value":5458},"size":{"value":22}},"98d23020-bbe9-44b7-945c-5fb156bbb973"],[{"index":{"value":5493},"size":{"value":21}},"a3bccec6-a58e-4f59-acb8-7d62254a4606"],[{"index":{"value":5493},"size":{"value":129}},"c0f46230-8337-4c2c-8509-cfc083604f9a"],[{"index":{"value":5493},"size":{"value":142}},"a297f5b7-0968-4828-b4b7-0f526234e6ae"],[{"index":{"value":5648},"size":{"value":10}},"8dec4773-71ca-474f-b013-f2158acdd9a6"],[{"index":{"value":5648},"size":{"value":71}},"4de1f30c-a0af-48a6-8cdd-d27168b4d3ac"]]
+{"ide":{"node":{"92a1ddfd-7652-4a61-b18f-adb097f6c829":{"position":{"vector":[-678,604]},"visualization":{"show":false,"width":372.4984375,"height":202.303125}},"a32cf4c3-d0c2-499d-8302-cb1865b95787":{"position":{"vector":[-589,532]}},"d5f7533b-7ae0-4c12-af3b-ccbf4bba666f":{"position":{"vector":[-589,460]}},"0a18098b-a2b8-46d1-b52f-93152bc07d08":{"position":{"vector":[-589,460]}},"85d9b304-b714-4c5d-b897-f19a33a56180":{"position":{"vector":[-678,388]},"visualization":{"show":false,"width":695.859375,"height":279.525}},"de411875-20f9-4184-8507-11f1339aa39c":{"position":{"vector":[-678,532]},"visualization":{"show":true,"width":695.859375,"height":279.525}},"38ce4445-1272-4395-8c7d-557283a903f6":{"position":{"vector":[-678,316]}},"9ba90154-866e-407b-b280-14bc1c6d3177":{"position":{"vector":[-678,316]}},"36e27072-1c27-4a3f-8093-8a00b7743ef2":{"position":{"vector":[-678,316]}},"f99ef96e-ec33-4702-ba8a-3e07741c1bad":{"position":{"vector":[-678,244]}},"c6a6ef77-962e-4d53-8572-40211ed7cc6e":{"position":{"vector":[-678,244]}},"af3265a6-ed1a-4fcf-879c-a62bf39f9d1b":{"position":{"vector":[-678,172]}},"23ccaea4-f2db-4630-9447-be2b930e97d5":{"position":{"vector":[-678,172]}},"ebe0b345-9d83-4241-a248-b38e8cf61865":{"position":{"vector":[-678,100]},"visualization":{"show":false,"height":377.846875}},"e467a614-9e76-45ca-b9bb-dd6d39afa442":{"position":{"vector":[-678,100]},"visualization":{"show":true}},"275a19f1-6064-4786-865b-e694b3768278":{"position":{"vector":[-678,100]}},"be60af2f-7b40-40bd-9b01-b8fe0c638095":{"position":{"vector":[-678,28]},"visualization":{"show":false,"height":253.9625}},"7a9f7f04-c2d9-4c0b-ad8a-cc4a3074a047":{"position":{"vector":[-678,5]}},"47d5cd00-640d-439d-ac2c-883a821f7406":{"position":{"vector":[-678,5]}},"a3ff5566-7a23-4b80-bfcb-858dd0d42f1c":{"position":{"vector":[-678,5]}},"2fb2e4d9-6f8f-4802-9f5a-48262545c83e":{"position":{"vector":[-678,-44]}},"3fee338c-f117-4d10-99f0-932ab685b4d0":{"position":{"vector":[-678,-44]}},"b0b6da6e-ee4d-45d7-81f8-109183fe47be":{"position":{"vector":[-678,-116]}},"20813c51-2c18-4df5-b18d-5b84ab446dbb":{"position":{"vector":[-678,-116]}},"0ad2dc7c-4617-417b-ba17-594e6d1fe41e":{"position":{"vector":[-678,-116]}},"5f337092-acf3-47be-a7f2-7b13d270e2eb":{"position":{"vector":[-678,-188]},"visualization":{"show":false,"height":267.23046875}},"51a96718-6d1f-4e4b-b4cb-1de7bb2b55bc":{"position":{"vector":[-678,-188]}},"928b87e3-4707-4cbb-bd63-30802525a37d":{"position":{"vector":[-678,-188]}},"49aa9abc-dcb3-4b79-9d1c-e66ca6190497":{"position":{"vector":[-678,-260]}},"7a3231bd-c13c-4b12-8bd3-4a6179d44dde":{"position":{"vector":[-678,-260]},"visualization":{"show":true}},"cad0c232-a1d9-49ea-b0b6-48e18d25d1e9":{"position":{"vector":[-678,-260]},"visualization":{"show":true}},"51fadcd7-8acf-4805-87e9-a94c3a015857":{"position":{"vector":[-678,-260]}},"b5b6ac4d-803d-4c52-b0ab-d47696f2af4c":{"position":{"vector":[-678,-332]}},"c052382d-e887-484f-8e38-8251eb41e53f":{"position":{"vector":[-678,-332]}},"13f63f5c-9b95-4ffc-a593-62b1e5379bd7":{"position":{"vector":[-678,-332]}},"3c978e87-17e3-4e07-8978-69a61f8fb25a":{"position":{"vector":[-678,-404]}},"c2280777-c04d-4757-aa9f-539075d0da08":{"position":{"vector":[-678,-404]},"visualization":{"show":true}},"727750b9-db4c-4152-90e9-3bb34af9d285":{"position":{"vector":[-678,-404]}},"bee7b8cc-8c10-418e-9adc-f505b11c8e57":{"position":{"vector":[-678,-476]}},"3e924f2e-cbaa-41d7-a7d0-6cca8008347e":{"position":{"vector":[-678,-476]}},"ee968447-ab89-4b74-a655-75042a9b8ca8":{"position":{"vector":[-678,-476]}},"dced2708-cd48-4e33-9c89-229003bd4a56":{"position":{"vector":[-678,-476]}},"7e9981bd-f6f3-4f06-8145-950fec353042":{"position":{"vector":[-562,-566]}},"33b404e7-1f43-4746-b931-5e28e3e4869c":{"position":{"vector":[-445,-587]},"visualization":{"show":true}},"ebaedb5a-f039-4df5-86dd-36baae23d886":{"position":{"vector":[-454,-587]}},"837f860d-9eaa-4c1e-9735-8d616f8a9ce5":{"position":{"vector":[-562,-638]},"visualization":{"show":false,"width":587.46484375}},"98d23020-bbe9-44b7-945c-5fb156bbb973":{"position":{"vector":[-678,-710]},"visualization":{"show":false,"width":867.3203125,"height":239.3671875}},"cd4d6fbc-feb6-4645-9ee4-83473fdf98d0":{"position":{"vector":[-675,-752]}},"a297f5b7-0968-4828-b4b7-0f526234e6ae":{"position":{"vector":[-678,-782]}},"c0f46230-8337-4c2c-8509-cfc083604f9a":{"position":{"vector":[-678,-782]},"visualization":{"show":true}},"a3bccec6-a58e-4f59-acb8-7d62254a4606":{"position":{"vector":[-678,-782]},"visualization":{"show":true}},"4de1f30c-a0af-48a6-8cdd-d27168b4d3ac":{"position":{"vector":[-678,-881]},"visualization":{"show":true}},"8dec4773-71ca-474f-b013-f2158acdd9a6":{"position":{"vector":[-678,-1040]}}},"import":{}}}
