@@ -1,0 +1,18 @@
+from Standard.Base import all
+from Standard.Table import all
+from Standard.Database import all
+from Standard.AWS import all
+from Standard.Google_Api import all
+from Standard.Snowflake import all
+import Standard.Examples
+import Standard.Visualization
+
+main =
+    file1 = Data.read Examples.welcome
+    text1 = "test"
+
+
+
+#### METADATA ####
+[[{"index":{"value":270},"size":{"value":26}},"fcf199e6-d2b1-44b7-be92-a47545d6a593"],[{"index":{"value":309},"size":{"value":6}},"eea76c94-cc1c-4077-8ffc-a2b713cb97cf"]]
+{"ide":{"node":{"fcf199e6-d2b1-44b7-be92-a47545d6a593":{"position":{"vector":[-406,494]},"visualization":{"show":true,"width":1027.671875,"height":193}},"eea76c94-cc1c-4077-8ffc-a2b713cb97cf":{"position":{"vector":[-226,70]},"visualization":{"show":true,"width":624.2421875}}},"import":{}}}

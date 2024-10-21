@@ -1,0 +1,82 @@
+from Standard.Base import all
+from Standard.Table import all
+from Standard.Database import all
+from Standard.AWS import all
+from Standard.Google_Api import all
+from Standard.Snowflake import all
+import Standard.Examples
+import Standard.Visualization
+
+## # 2024: Week 42 - Strictly Come Dancing
+   
+   [October 16, 2024](https://preppindata.blogspot.com/2024/10/2024-week-42-strictly-come-dancing.html "permanent link")
+   
+   Challenge by: Jenny Martin
+   
+   Autumn is always the time of year that [Strictly Come Dancing](https://en.wikipedia.org/wiki/Strictly_Come_Dancing) returns to our TVs in the UK. I always find it interesting which songs are chosen for the couples to dance to - particularly when there are repeats. With 22 seasons, this repetition is not surprising, so I set about gathering a dataset that would allow me to see what the most common song choices are. 
+   
+   ### Inputs
+   
+   I used this as an opportunity to learn to webscrape [Wikipedia](https://en.wikipedia.org/wiki/Strictly_Come_Dancing_series_1) using Python (with a lot of help from ChatGPT!), so the resulting table is a combination of each dance from each series:
+   
+   ![](https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhvm7R6X5bamhGnbiK-_Ku7vZQqi5JwUb2Y_2t4zAc2vX0Quq7jzGKrq3NEXXzUn36CxdolKPQBLCrV7PRx25Vn3LKz9jSDbGJUWlIy4rao4VayDGOjPrY-yvKuxyb4W9XeH_f5LnOmJIK0EnHbyTZkswlhodxzNiqd1zxSAhT_ZTy2EmLuMnvE_tUgkRfh/w640-h226/Screenshot%202024-10-14%20154111.png)
+   
+   ### Requirements
+   
+   - [Input the data](https://drive.google.com/file/d/197jo7UMVU_PDO9QGcYu9zKXjZgn3R4a9/view?usp=drive_link)
+   - One thing the data is missing is a year field for when the Series took place
+       - Series 1 and 2 were both in 2004
+       - All following series happen annually
+           - Series 3 in 2005 etc.
+   - The webscraping isn't quite perfect and the table headers are repeated throughout the dataset, make sure these are removed
+   - Split the Week field into a numeric value and put extra details in the theme week 
+       - Split this theme week further, so that it it's the Final/Semi Final/Quarter Final this detail is in a Stage field instead
+   - The Score field is made up of the Total Score and individual judges scores. Since the number of judges can vary depending on the series/week, split the Score field into these 2 categories
+   - In certain weeks there can be a group dance. These can be identified by the word group or marathon in the Dance field. Update the Couple field to be Group and ensure there is only 1 row for these dances so the music choice is only counted once
+   - There can be more than 1 song in the Music field. Make sure there is a row for each song, as well as the song and artist being in separate fields
+   - You may notice we have some additional fields such as Film and Musical. These correspond with the theme weeks. Since there will only be a maximum of 1 theme per week, combine these fields into 1
+   - Remove unnecessary fields
+   - [Output the data](https://drive.google.com/file/d/1ovKFvX-33CVthnZRBzG8X3JzaDkCe8KE/view?usp=drive_link)
+   
+   ### Output
+   
+   ![](https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhy3mQ3fmxSOZIgyghMnQrdcgq9bljuqexnDgHFGMnWtNckWExqYUlO_y4_TGSdnC3m1mXTJUoilb2OxBZGlRjndAz7JA0fpZsmJuFVkBDhm0kEAEEeQTUPeHGNpNOVKfH5CPCV0yzt-60Id2vgt0zkQsB0FfiXAlAc0OhvazS-_9TT2NwnpdR8XfDE1cka/w640-h166/Screenshot%202024-10-15%20201615.png)
+   
+   - 13 fields
+       - Year
+       - Series
+       - Week
+       - Stage
+       - Theme
+       - Theme Detail
+       - Couple
+       - Score
+       - Judges Scores
+       - Dance
+       - Song
+       - Artist
+       - Result
+   - 2,524 rows (2,525 including headers)
+   
+   You can view the output [here](https://drive.google.com/file/d/1ovKFvX-33CVthnZRBzG8X3JzaDkCe8KE/view?usp=drive_link).
+   
+   After you finish the challenge make sure to fill in the [participation tracker](https://docs.google.com/forms/d/e/1FAIpQLSdZzudRXwUvjhWwNawwz1kGXcYeQ9gBnAhCOvlA7qEDknGu4A/viewform), then share your solution on Twitter using [#PreppinData](https://twitter.com/search?q=%23preppindata&src=typed_query) and tagging [@Datajedininja](https://twitter.com/Datajedininja), [@JennyMartinDS14](https://twitter.com/JennyMartinDS14) & [@TomProwse1](https://twitter.com/TomProwse1)
+   
+   
+   
+   You can also post your solution on the [Tableau Forum](https://community.tableau.com/s/group/0F94T000000gQqoSAE/preppindata) where we have a Preppin' Data community page. Post your solutions and ask questions if you need any help! 
+main =
+    file2 = Data.read (enso_project.data / 'strictly_come_dancing_series_1_to_21_tables.csv')
+    any1 = file2.set (expr 'if [Series] = 1 OR [Series] = 2 then 2004 else [Series]+2002') 'Year'
+    any2 = any1.filter 'Scores' (..Not_Equal "Scores")
+    table1 = any2.split_to_columns 'Week' ': '
+    table2 = table1.text_cleanse ['Week 1'] [..Letters, ..All_Whitespace]
+    any3 = table2.rename_columns [(Pair.Value 'Week 1' 'Week'), (Pair.Value 'Week 2' 'Theme Week')]
+    any4 = any3.aggregate ['Theme Week']
+    any5 = any3.set (expr 'if contains([Theme Week], "Semi") then 1')
+
+
+
+#### METADATA ####
+[[{"index":{"value":4550},"size":{"value":81}},"35a68050-b8bb-4ee8-9b18-989e875c6cc3"],[{"index":{"value":4643},"size":{"value":9}},"8f389f6a-074b-41c7-a9de-8c44d38ef643"],[{"index":{"value":4643},"size":{"value":79}},"5b10a0b6-d64f-4cd0-bd2d-9352009ae38b"],[{"index":{"value":4643},"size":{"value":86}},"733fef7f-182b-4d6f-99bc-df48856afcda"],[{"index":{"value":4741},"size":{"value":11}},"9ed551f9-f35c-47b0-b741-7143a22ac1f9"],[{"index":{"value":4741},"size":{"value":20}},"5907cd2b-011b-47e3-a9dc-aadd9b1384ac"],[{"index":{"value":4741},"size":{"value":43}},"899e0680-d185-42bd-a8ae-5c9e32518875"],[{"index":{"value":4798},"size":{"value":21}},"e199452f-97a6-4106-bfde-1bde1b9cdddd"],[{"index":{"value":4798},"size":{"value":28}},"ad5c70f4-b93a-442e-aadd-ad1b6de1a819"],[{"index":{"value":4798},"size":{"value":33}},"2d06939c-7963-4201-959a-12a911a4c5bb"],[{"index":{"value":4845},"size":{"value":19}},"796428c0-89d1-4f88-9174-a27f58cac6c7"],[{"index":{"value":4845},"size":{"value":30}},"e09a053a-2c48-4f7c-9ae9-c4031fcaab5d"],[{"index":{"value":4845},"size":{"value":60}},"3d1dca0b-1a49-4ac3-97b0-3317e7be2153"],[{"index":{"value":4917},"size":{"value":21}},"332275a2-81a9-495b-b4e7-3a69d7f541bc"],[{"index":{"value":4917},"size":{"value":88}},"641e96ef-619e-4a63-a733-64c92de5f50e"],[{"index":{"value":5017},"size":{"value":14}},"48345317-db87-4974-9369-e72bc86f5121"],[{"index":{"value":5017},"size":{"value":29}},"77b0eb7f-a373-4e6b-806a-7d5506829eb7"],[{"index":{"value":5058},"size":{"value":8}},"e0600afc-06bf-4187-9ff1-b14e2889ee10"],[{"index":{"value":5058},"size":{"value":58}},"de158324-f7ec-42b9-8623-f050ba5231dc"]]
+{"ide":{"node":{"35a68050-b8bb-4ee8-9b18-989e875c6cc3":{"position":{"vector":[-662,596]},"visualization":{"show":false,"width":857.6640625,"height":261.78359375}},"733fef7f-182b-4d6f-99bc-df48856afcda":{"position":{"vector":[-662,524]},"visualization":{"show":false,"height":339.80859375}},"5b10a0b6-d64f-4cd0-bd2d-9352009ae38b":{"position":{"vector":[-662,226]}},"8f389f6a-074b-41c7-a9de-8c44d38ef643":{"position":{"vector":[-662,226]}},"899e0680-d185-42bd-a8ae-5c9e32518875":{"position":{"vector":[-662,452]},"visualization":{"show":true,"width":835.5390625,"height":295.8046875}},"5907cd2b-011b-47e3-a9dc-aadd9b1384ac":{"position":{"vector":[-662,452]}},"9ed551f9-f35c-47b0-b741-7143a22ac1f9":{"position":{"vector":[-662,452]}},"2d06939c-7963-4201-959a-12a911a4c5bb":{"position":{"vector":[-662,48]},"visualization":{"show":false,"width":698.5703125,"height":239.765625}},"ad5c70f4-b93a-442e-aadd-ad1b6de1a819":{"position":{"vector":[-662,48]}},"e199452f-97a6-4106-bfde-1bde1b9cdddd":{"position":{"vector":[-662,48]}},"3d1dca0b-1a49-4ac3-97b0-3317e7be2153":{"position":{"vector":[-662,-24]}},"e09a053a-2c48-4f7c-9ae9-c4031fcaab5d":{"position":{"vector":[-662,-24]}},"796428c0-89d1-4f88-9174-a27f58cac6c7":{"position":{"vector":[-662,-24]}},"641e96ef-619e-4a63-a733-64c92de5f50e":{"position":{"vector":[-662,-96]},"visualization":{"show":false,"height":336.859375}},"332275a2-81a9-495b-b4e7-3a69d7f541bc":{"position":{"vector":[-662,-282]}},"77b0eb7f-a373-4e6b-806a-7d5506829eb7":{"position":{"vector":[-662,-168]},"visualization":{"show":true,"width":393.94140625,"height":539.00390625}},"48345317-db87-4974-9369-e72bc86f5121":{"position":{"vector":[-662,-168]}},"de158324-f7ec-42b9-8623-f050ba5231dc":{"position":{"vector":[-201,-168]},"visualization":{"show":true}},"e0600afc-06bf-4187-9ff1-b14e2889ee10":{"position":{"vector":[-201,-168]}}},"import":{}}}
